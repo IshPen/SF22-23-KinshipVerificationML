@@ -94,7 +94,7 @@ def main_func(img):
           triangle_img = getTriangle(facialTriangles[i][0], facialTriangles[i][1], facialTriangles[i][2], landmarks, img_gray, img)
           pixelsList = colorsInTriangle(triangle_img)
           bgrResult = average_tuple(pixelsList)
-          rgbResult = (bgrResult[2], bgrResult[1], bgrResult[0])
+          #rgbResult = (bgrResult[2], bgrResult[1], bgrResult[0])
           #print(rgbResult)
           #triangle_img = cv2.resize(triangle_img, (triangle_img.shape[0] * 5, triangle_img.shape[1] * 5))
           #cv2.imshow("triangle_img", triangle_img)
@@ -133,10 +133,15 @@ def threeD_distance(x,y,z, x1,y1,z1):
 if __name__ == "__main__":
     noBGArr = os.listdir(f_root)
     counter = 0
+    for i in range(3673, len(noBGArr)):
+        cv2.imwrite((save_root + "simplifiedF" + noBGArr[i][5:]), main_func(noBGArr[i]))
+        print(i)
+    '''
     for i in noBGArr:
         cv2.imwrite((save_root + "simplifiedF" + i[5:]), main_func(i))
         counter += 1
         print(counter)
+    '''
     #out1 = main_func("noBGface9.jpg")
     #out2 = main_func("noBGface2228.jpg")
     #print(threeD_distance(out1[0],out1[1],out1[2],out2[0],out2[1],out2[2]))
