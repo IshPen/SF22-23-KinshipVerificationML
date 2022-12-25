@@ -30,7 +30,7 @@ colorsList = [
 (219, 10, 125)]
 #f_root = "/content/drive/MyDrive/scienceFairFaces/"
 f_root = "D:/Programs/Program Files/Pycharm Projects/SF22-23-KinshipVerificationML/Data/scienceFairRawFacesNOBG/"
-save_root = "D:/Programs/Program Files/Pycharm Projects/SF22-23-KinshipVerificationML/Data/"
+save_root = "D:/Programs/Program Files/Pycharm Projects/SF22-23-KinshipVerificationML/Data/scienceFairTriangulatedFaces/"
 
 def colorsInTriangle(img):
     pixelColors = []
@@ -95,7 +95,7 @@ def main_func(img):
           pixelsList = colorsInTriangle(triangle_img)
           bgrResult = average_tuple(pixelsList)
           rgbResult = (bgrResult[2], bgrResult[1], bgrResult[0])
-          print(rgbResult)
+          #print(rgbResult)
           #triangle_img = cv2.resize(triangle_img, (triangle_img.shape[0] * 5, triangle_img.shape[1] * 5))
           #cv2.imshow("triangle_img", triangle_img)
           #cv2.waitKey()
@@ -132,8 +132,11 @@ def threeD_distance(x,y,z, x1,y1,z1):
 
 if __name__ == "__main__":
     noBGArr = os.listdir(f_root)
+    counter = 0
     for i in noBGArr:
         cv2.imwrite((save_root + "simplifiedF" + i[5:]), main_func(i))
+        counter += 1
+        print(counter)
     #out1 = main_func("noBGface9.jpg")
     #out2 = main_func("noBGface2228.jpg")
     #print(threeD_distance(out1[0],out1[1],out1[2],out2[0],out2[1],out2[2]))
