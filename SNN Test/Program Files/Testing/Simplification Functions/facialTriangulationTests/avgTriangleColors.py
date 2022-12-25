@@ -77,7 +77,7 @@ def customAddColorImages(img1, img2):
 
 def main_func(img):
   #init image
-  img_name = img
+  #img_name = img
   img = cv2.imread(f_root+img)
   img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
   detector = dlib.get_frontal_face_detector()
