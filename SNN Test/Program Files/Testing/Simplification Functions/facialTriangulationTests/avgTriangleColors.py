@@ -3,6 +3,7 @@
 # 2. Get avg color of triangle by looking at all non black triangles
 # 3. Replace all coordinates in the triangle with avg color
 # 4. Show each color triangle
+import os
 import random
 
 import cv2
@@ -29,6 +30,7 @@ colorsList = [
 (219, 10, 125)]
 #f_root = "/content/drive/MyDrive/scienceFairFaces/"
 f_root = "D:/Programs/Program Files/Pycharm Projects/SF22-23-KinshipVerificationML/Data/scienceFairRawFacesNOBG/"
+save_root = "D:/Programs/Program Files/Pycharm Projects/SF22-23-KinshipVerificationML/Data/"
 
 def colorsInTriangle(img):
     pixelColors = []
@@ -75,64 +77,72 @@ def customAddColorImages(img1, img2):
 
 def main_func(img):
   #init image
+  img_name = img
   img = cv2.imread(f_root+img)
   img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
   detector = dlib.get_frontal_face_detector()
   predictor = dlib.shape_predictor("D:\Programs\Program Files\Pycharm Projects\SF22-23-KinshipVerificationML\shape_predictor_68_face_landmarks.dat")
   faces = detector(img_gray)
-  face = faces[0]
 
-  landmarks = predictor(img_gray, face)
+  if len(faces) > 0:
+      face = faces[0]
 
-  segmentImages = []
-  for i in range(0, len(facialTriangles)):
-      triangle_img = getTriangle(facialTriangles[i][0], facialTriangles[i][1], facialTriangles[i][2], landmarks, img_gray, img)
-      pixelsList = colorsInTriangle(triangle_img)
-      bgrResult = average_tuple(pixelsList)
-      rgbResult = (bgrResult[2], bgrResult[1], bgrResult[0])
-      print(rgbResult)
-      #triangle_img = cv2.resize(triangle_img, (triangle_img.shape[0] * 5, triangle_img.shape[1] * 5))
-      #cv2.imshow("triangle_img", triangle_img)
-      #cv2.waitKey()
-      avgColorTriangle = writeAvgColorToTriangle(bgrResult, triangle_img)
-      segmentImages.append(avgColorTriangle)
-      #cv2.imshow("avgColorTriangle", avgColorTriangle)
-      #cv2.waitKey()
+      landmarks = predictor(img_gray, face)
 
-  finalOutput = segmentImages[0]
-  for i in range(0, len(segmentImages) - 1):
-      finalOutput = customAddColorImages(finalOutput, segmentImages[i + 1])
-      #cv2.imshow("segment", segmentImages[i])
+      segmentImages = []
+      for i in range(0, len(facialTriangles)):
+          triangle_img = getTriangle(facialTriangles[i][0], facialTriangles[i][1], facialTriangles[i][2], landmarks, img_gray, img)
+          pixelsList = colorsInTriangle(triangle_img)
+          bgrResult = average_tuple(pixelsList)
+          rgbResult = (bgrResult[2], bgrResult[1], bgrResult[0])
+          print(rgbResult)
+          #triangle_img = cv2.resize(triangle_img, (triangle_img.shape[0] * 5, triangle_img.shape[1] * 5))
+          #cv2.imshow("triangle_img", triangle_img)
+          #cv2.waitKey()
+          avgColorTriangle = writeAvgColorToTriangle(bgrResult, triangle_img)
+          segmentImages.append(avgColorTriangle)
+          #cv2.imshow("avgColorTriangle", avgColorTriangle)
+          #cv2.waitKey()
+
+      finalOutput = segmentImages[0]
+      for i in range(0, len(segmentImages) - 1):
+          finalOutput = customAddColorImages(finalOutput, segmentImages[i + 1])
+          #cv2.imshow("segment", segmentImages[i])
+          #cv2.imshow("finalOutput", finalOutput)
+          #cv2.waitKey()
+
+
+      finalOutput = customAddColorImages(img, finalOutput)
+      #finalOutput = cv2.resize(finalOutput, (finalOutput.shape[0]*5, finalOutput.shape[1]*5))
       #cv2.imshow("finalOutput", finalOutput)
       #cv2.waitKey()
 
-
-  finalOutput = customAddColorImages(img, finalOutput)
-  finalOutput = cv2.resize(finalOutput, (finalOutput.shape[0]*5, finalOutput.shape[1]*5))
-  cv2.imshow("finalOutput", finalOutput)
-  cv2.waitKey()
-
-  #finalOutput = cv2.GaussianBlur(finalOutput,(25,25),cv2.BORDER_DEFAULT)
-  #cv2.imshow("finalOutput", finalOutput)
-  #cv2.waitKey()
-  rgbVals = round(average_tuple(pixelsList)[2]), round(average_tuple(pixelsList)[1]), round(average_tuple(pixelsList)[0])
-  print("Final AVG RGB: ", rgbVals)
-  return rgbVals
+      #finalOutput = cv2.GaussianBlur(finalOutput,(25,25),cv2.BORDER_DEFAULT)
+      #cv2.imshow("finalOutput", finalOutput)
+      #cv2.waitKey()
+      rgbVals = round(average_tuple(pixelsList)[2]), round(average_tuple(pixelsList)[1]), round(average_tuple(pixelsList)[0])
+      print("Final AVG RGB: ", rgbVals)
+      return finalOutput
+  else:
+      return img
 
 
 def threeD_distance(x,y,z, x1,y1,z1):
   return math.sqrt((x-x1)**2 + (y-y1)**2 + (z-z1)**2)
 
 if __name__ == "__main__":
-    out1 = main_func("noBGface9.jpg")
-    out2 = main_func("noBGface2228.jpg")
-    print(threeD_distance(out1[0],out1[1],out1[2],out2[0],out2[1],out2[2]))
+    noBGArr = os.listdir(f_root)
+    for i in noBGArr:
+        cv2.imwrite((save_root + "simplifiedF" + i[5:]), main_func(i))
+    #out1 = main_func("noBGface9.jpg")
+    #out2 = main_func("noBGface2228.jpg")
+    #print(threeD_distance(out1[0],out1[1],out1[2],out2[0],out2[1],out2[2]))
     #print(midValAndSaturation(convertBGRtoHSV(bgrResult[0], bgrResult[1], bgrResult[2])))
     #print(gVals)
     #print(rVals)
     #cv2.imshow("Mask", mask)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    #cv2.waitKey(0)
+    #cv2.destroyAllWindows()
 
     #White 1 -
     #Black 1 -
