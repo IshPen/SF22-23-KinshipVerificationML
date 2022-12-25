@@ -1,0 +1,143 @@
+Registration
+Thanks for submitting your contact info!
+
+The latest-and-greatest splits were added 6 July 2020, as part of the 2020 RFIW Data Challenge.
+
+Any special requests or questions, or to report any bugs, make suggestions, contribute, or share ideas, your email would be well appreciated.
+
+Contact: Joseph (Joe) Robinson
+Email: robinson.jo@northeastern.edu
+Web: https://www.jrobsvision.com/
+
+-------------------------------------------------------------------------------------------------------------------------------------
+
+If FIW is used or found useful please cite related, https://web.northeastern.edu/smilelab/fiw/publications.html
+-------------------------------------------------------------------------------------------------------------------------------------
+
+6 July 2020 (v 0.2.0)
+
+RFIW 2020 (https://web.northeastern.edu/smilelab/rfiw2020/), held as an IEEE FG Challenge, is made up of 3 tasks. Specifically, kinship verification (T-1), Tri-Subject Verification (T-2), and Search & Retrieval (T-3). For this, Family IDs are split into 3 sets (i.e., train, val, and test). Train and val were provided for development purposes, while the test was reserved for "blind" evaluation. Now, data and labels are provided for each. As reported in the white paper (downloadable via https://arxiv.org/abs/2002.06303 or https://www.computer.org/csdl/proceedings-article/fg/2020/307900a877/1kecJ3M0dZC), the test set is used to report the final performance. Thus, both train and validation are designated for training the final models deployed for evaluating the test set.
+
+Here we provide downloadable links for each task, along with links to learn more about the tasks (i.e., as reported in white paper pointed to above):
+
+====================
+Kinship Verification (T-1)
+====================
+Original Codalab portal, https://competitions.codalab.org/competitions/21843
+
+TRAIN :
+   - Images: https://www.dropbox.com/s/k7uest3kzfqfejd/train-faces.zip?dl=0
+   - Pair List (CSV):  https://www.dropbox.com/s/b6sak9ztgqpjalm/train-pairs.csv?dl=0
+
+VALIDATION:
+   - Images: https://www.dropbox.com/s/vnplu700aj6myj2/val-faces.zip?dl=0
+   - Pair List (CSV): https://1drv.ms/u/s!AkDk_XdBkJ9wgocNDTeTlxm_gMyr_w?e=EJC5Ow
+
+
+  TEST
+   - Images: https://1drv.ms/u/s!AkDk_XdBkJ9whucX3Aed4R19VMspHQ?e=ZEbA0q
+   - Pair List (CSV): https://1drv.ms/x/s!AkDk_XdBkJ9whucnzPqsyQ05oJ_6Gw?e=vNml2e
+   - Labels (CSV): https://1drv.ms/u/s!AkDk_XdBkJ9whucY7JgR7Oi_MrZ5fw?e=6QqKNp
+
+#### 19890 and onwards are false pairs
+====================
+Tri-subject Verification (T-2)
+====================
+Original Codalab portal, https://competitions.codalab.org/competitions/22117
+
+TRAIN
+   - Images: https://1drv.ms/u/s!AkDk_XdBkJ9whucTlnSpGRK0PERUmQ?e=t46GLs
+   - Triplet list (CSV), https://1drv.ms/u/s!AkDk_XdBkJ9whucPNNCLTLdVASCpmQ?e=TJrWdb
+
+VAL
+   - Images: https://1drv.ms/u/s!AkDk_XdBkJ9whucUb_esMg9C74-lGw?e=1em9Qv
+   - Triplet List (CSV): https://1drv.ms/u/s!AkDk_XdBkJ9whucS8n6_PNSyZuQclA?e=LzcK5h
+
+
+TEST
+   - Images: https://www.dropbox.com/sh/fnkyhmh6hsv9dur/AADfrejH6lnpblB6XjlS5au2a?dl=0
+   - Triplet List (CSV): https://1drv.ms/u/s!AkDk_XdBkJ9wh5BKGCXNuF1kRd3gNw?e=36c1eu
+
+
+====================
+Search and Retrieval (T-3)
+====================
+Original Codalab portal, https://competitions.codalab.org/competitions/22152
+
+    --- README (MARKDOWN), https://1drv.ms/u/s!AkDk_XdBkJ9wgat1WAl87XfYbMwDqg?e=rJbop9
+
+*TRAIN
+   -- Face Data, https://1drv.ms/u/s!AkDk_XdBkJ9wgatyw-PBj1RCh3x9yQ?e=ufdqkm
+   --- Triplet list (CSV),
+
+*VAL
+   --- Face Data, https://1drv.ms/u/s!AkDk_XdBkJ9wgbklQJ85kYZEHcMPPQ?e=hkNgLp (Probes) and https://1drv.ms/u/s!AkDk_XdBkJ9wgbkkA1QMlrxpZuZj1Q?e=ILUSIb (Gallery)
+   --- Probes Labeled (CSV), https://1drv.ms/x/s!AkDk_XdBkJ9wgdp223FQO1FMAViTCA?e=6gmyC2 (Probes, unlabled) https://1drv.ms/u/s!AkDk_XdBkJ9wgdFPn8YdEFfhC_65yw?e=3FoHzF (Gallery)
+   --- List Unlabeled (CSV), https://1drv.ms/u/s!AkDk_XdBkJ9wgbklQJ85kYZEHcMPPQ?e=hkNgLp (Probes) and https://1drv.ms/u/s!AkDk_XdBkJ9wgbkkA1QMlrxpZuZj1Q?e=ILUSIb (Gallery)
+   --- Probes Labeled (CSV), https://1drv.ms/x/s!AkDk_XdBkJ9whucS8n6_PNSyZuQclA?e=T2H9i6
+
+*TEST
+    --- Face Data, https://1drv.ms/u/s!AkDk_XdBkJ9wh5AbPxntsKa1dEyw6w?e=XeZO5l (Probes) and https://1drv.ms/u/s!AkDk_XdBkJ9wh5AaXtnDqwmUTCVo_w?e=vuvNq9 (Gallery)
+    --- Face List (CSV), https://1drv.ms/x/s!AkDk_XdBkJ9wh5AeUdNM2nZq0m5Ngw?e=dyu7gt (Probes) and https://1drv.ms/x/s!AkDk_XdBkJ9wh5AczwHPRVKrNP9_ig?e=e1eFAX (Gallery)
+    --- Ground-truth labeled (CSV), https://1drv.ms/x/s!AkDk_XdBkJ9wh5AdoeaaNepWFYOTJQ?e=ogqZFC
+    --- Sample output (CSV), https://1drv.ms/u/s!AkDk_XdBkJ9wh5Af-M3YY2MZiaEYJQ?e=nan0q2
+
+
+---------------------------------------------------------------------------------------------------------------------
+------
+-------------------------------------------------------------------------------------------------------------------------------------
+4 December 2019 (v 0.1.2)
+Family Face Data, verification pair lists, and protocols, along with face encodings, available on One Drive, https://1drv.ms/u/s!AkDk_XdBkJ9wh5AgFLcx9r_J4ky6Rg?e=fy3lPV
+
+Codalabs competition hosted as a data challenge workshop in conjunction with the 2020 IEEE FG Conference:
+
+    Kinship Verification (T-1)
+        https://competitions.codalab.org/competitions/21843
+
+    Tri-Subject Verification (T-2)
+        https://competitions.codalab.org/competitions/22117
+
+    Workshop website:
+         https://web.northeastern.edu/smilelab/rfiw2020/
+
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+2017 (v 0.1.1)
+Data
+Family List:
+     https://1drv.ms/u/s!AkDk_XdBkJ9whk2vCAgT7ly1q85J (csv)
+     https://1drv.ms/u/s!AkDk_XdBkJ9whk47NQfRPKLudWPt (numbers)
+
+Family Photo List:
+     https://1drv.ms/u/s!AkDk_XdBkJ9whk_6ssK-Z7lOqjN0 (csv)
+     https://1drv.ms/u/s!AkDk_XdBkJ9whlHmdLKKTM-GqAhH (numbers)
+
+Relationship LUT
+     https://1drv.ms/u/s!AkDk_XdBkJ9whlBp-Ej6Z1QdzNvk (csv)
+
+Face Data
+      https://1drv.ms/u/s!AkDk_XdBkJ9whlQQkd2rOXSREro-
+
+Photo-level Labels,
+      https://1drv.ms/u/s!AkDk_XdBkJ9whlMaiPhsQuY1P_y8
+
+Family-level Labels
+     https://1drv.ms/u/s!AkDk_XdBkJ9whlLtkhZM8c6B-EZh
+
+
+
+Task Evaluations
+
+Kinship Verification (5-fold, no family overlap)
+     https://1drv.ms/u/s!AkDk_XdBkJ9whlVoqEj8xx7DJh9z (csv)</a>, <a
+     https://1drv.ms/u/s!AkDk_XdBkJ9whldXl5q-zjsqKCXd (mat)
+
+Family Classification (5-fold, no member overlap)
+     https://1drv.ms/u/s!AkDk_XdBkJ9whlYaGENBR-nguc1j
+
+
+
+Competition Data (see Codalab portals):
+     https://competitions.codalab.org/competitions/16742 (Verification)
+     https://competitions.codalab.org/competitions/16745 (Classification)
