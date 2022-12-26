@@ -30,8 +30,8 @@ colorsList = [
 (219, 10, 125)]
 #f_root = "/content/drive/MyDrive/scienceFairFaces/"
 f_root = "D:/Programs/Program Files/Pycharm Projects/SF22-23-KinshipVerificationML/Data/scienceFairRawFacesNOBG/"
-save_root = "D:/Programs/Program Files/Pycharm Projects/SF22-23-KinshipVerificationML/Data/scienceFairTriangulatedFaces/"
-
+#save_root = "D:/Programs/Program Files/Pycharm Projects/SF22-23-KinshipVerificationML/Data/scienceFairTriangulatedFaces/"
+save_root = r"D:/Programs/Program Files/Pycharm Projects/SF22-23-KinshipVerificationML/SNN Test/Program Files/Testing/Simplification Functions/facialTriangulationTests/scienceFairTriangulatedFaces/"
 def colorsInTriangle(img):
     pixelColors = []
     for i in range(0, len(img)):
@@ -133,8 +133,9 @@ def threeD_distance(x,y,z, x1,y1,z1):
 if __name__ == "__main__":
     noBGArr = os.listdir(f_root)
     counter = 0
-    for i in range(3673, len(noBGArr)):
+    for i in range(0, len(noBGArr)):
         cv2.imwrite((save_root + "simplifiedF" + noBGArr[i][5:]), main_func(noBGArr[i]))
+        print(save_root + "simplifiedF" + noBGArr[i][5:])
         print(i)
     '''
     for i in noBGArr:
