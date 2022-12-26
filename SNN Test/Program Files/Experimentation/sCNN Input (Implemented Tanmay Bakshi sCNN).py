@@ -17,12 +17,15 @@ from keras import backend as K
 from keras.models import Model
 from keras.layers import *
 import cv2
+import time
+
 from sklearn.model_selection import train_test_split
 from facialTriangulationAvg import triangulation
-
+from sklearn import metrics
 resize = (28, 28)
 
 path = "D:\Programs\Program Files\Pycharm Projects\SF22-23-KinshipVerificationML\Data\scienceFairRawFacesNOBG"
+simplified_path = "D:\Programs\Program Files\Pycharm Projects\SF22-23-KinshipVerificationML\Data\scienceFairTriangulatedFaces"
 csvPath = "D:\Programs\Program Files\Pycharm Projects\SF22-23-KinshipVerificationML\SNN Test\Data\Triplet-Loss-Pairs.csv"
 
 anchor_paths = []
@@ -33,7 +36,7 @@ anchor_images = []
 positive_images = []
 negative_images = []
 
-def convertCSVtoImageArray(path, csvPath):
+def convertCSVtoImageArray(path, csvPath, simplified, contrast, brightness):
     global anchor_paths, positive_paths, negative_paths
     global anchor_images, positive_images, negative_images
 
@@ -57,19 +60,31 @@ def convertCSVtoImageArray(path, csvPath):
     getImagesFromCSV(csvPath)
 
     for image in range(0, len(anchor_paths)):
-        #if image%1 == 0:
-        print(image)
-        a_i = cv2.imread(str(path + r"\noBG" + anchor_paths[image]))
-        a_i = triangulation(a_i)
-        a_i = cv2.resize(a_i, resize)
+        if image%100 == 0:
+            print(image)
 
-        p_i = cv2.imread(str(path + r"\noBG" + positive_paths[image]))
-        p_i = triangulation(p_i)
-        p_i = cv2.resize(p_i, resize)
+        ## IMAGE SOURCING ##
 
-        n_i = cv2.imread(str(path + r"\noBG" + negative_paths[image]))
-        n_i = triangulation(n_i)
-        n_i = cv2.resize(n_i, resize)
+        if simplified==True:
+            a_i = cv2.imread(str(simplified_path + r"\simplifiedF" + (anchor_paths[image])[1:]))
+            a_i = cv2.resize(a_i, resize)
+
+            p_i = cv2.imread(str(simplified_path + r"\simplifiedF" + (positive_paths[image])[1:]))
+            p_i = cv2.resize(p_i, resize)
+
+            n_i = cv2.imread(str(simplified_path + r"\simplifiedF" + (negative_paths[image])[1:]))
+            n_i = cv2.resize(n_i, resize)
+
+        elif simplified==False:
+            a_i = cv2.imread(str(path + r"\noBG" + anchor_paths[image]))
+            a_i = cv2.resize(a_i, resize)
+            # print(str(simplified_path + r"\simplifiedF" + (anchor_paths[image])[1:]))
+
+            p_i = cv2.imread(str(path + r"\noBG" + positive_paths[image]))
+            p_i = cv2.resize(p_i, resize)
+
+            n_i = cv2.imread(str(path + r"\noBG" + negative_paths[image]))
+            n_i = cv2.resize(n_i, resize)
 
         anchor_images.append(a_i)
         positive_images.append(p_i)
@@ -98,21 +113,8 @@ def convertCSVtoImageArray(path, csvPath):
 
     return (anchor_images, positive_images, negative_images)
 
-(anchors, positives, negatives) = convertCSVtoImageArray(path=path, csvPath=csvPath)
 
-x_train = np.array((anchors[0:int(len(anchors)*0.7)], positives[0:int(len(anchors)*0.7)], negatives[0:int(len(anchors)*0.7):]))
-x_test = np.array((anchors[int(len(anchors)*0.7):], positives[int(len(anchors)*0.7):], negatives[int(len(anchors)*0.7):]))
-y_train = np.arange(0, int(len(anchors)*0.7))
-y_test = np.arange(int(len(anchors)*0.7), int(len(anchors)))
-
-print(anchors.shape)
-print(positives.shape)
-print(negatives.shape)
-print(x_train.shape)
-print(x_test.shape)
-
-
-
+# Below data_generator is not used
 def data_generator(batch_size=64):
     while True:
         a = []
@@ -127,8 +129,7 @@ def data_generator(batch_size=64):
             n.append(negative_sample)
         yield ([np.array(a), np.array(p), np.array(n)], np.zeros((batch_size, 1)).astype("float32"))
 
-
-
+#triplet_loss function
 def triplet_loss(y_true, y_pred):
     anchor_out = y_pred[:, 0:100]
     positive_out = y_pred[:, 100:200]
@@ -141,50 +142,162 @@ def triplet_loss(y_true, y_pred):
 
     return K.mean(K.abs(probs[0]) + K.abs(1.0 - probs[1]))
 
+def build_model(steps_per_epoch, epochs, b_size):
+    input_layer = Input((resize[0], resize[1], 3))
 
-input_layer = Input((resize[0], resize[1], 3))
+    x = Conv2D(32, 3, activation="relu")(input_layer)
+    x = Conv2D(32, 3, activation="relu")(x)
+    x = MaxPool2D(2)(x)
+    x = Conv2D(64, 3, activation="relu")(x)
+    x = Conv2D(64, 3, activation="relu")(x)
+    x = MaxPool2D(2)(x)
+    x = Conv2D(128, 3, activation="relu")(x)
+    x = Flatten()(x)
+    x = Dense(100, activation="relu")(x)
+    model = Model(input_layer, x)
+    model.summary()
 
-x = Conv2D(32, 3, activation="relu")(input_layer)
-x = Conv2D(32, 3, activation="relu")(x)
-x = MaxPool2D(2)(x)
-x = Conv2D(64, 3, activation="relu")(x)
-x = Conv2D(64, 3, activation="relu")(x)
-x = MaxPool2D(2)(x)
-x = Conv2D(128, 3, activation="relu")(x)
-x = Flatten()(x)
-x = Dense(100, activation="relu")(x)
-model = Model(input_layer, x)
-model.summary()
+    triplet_model_a = Input((resize[0], resize[1], 3))
+    triplet_model_p = Input((resize[0], resize[1], 3))
+    triplet_model_n = Input((resize[0], resize[1], 3))
 
-triplet_model_a = Input((resize[0], resize[1], 3))
-triplet_model_p = Input((resize[0], resize[1], 3))
-triplet_model_n = Input((resize[0], resize[1], 3))
+    triplet_model_out = Concatenate()([model(triplet_model_a), model(triplet_model_p), model(triplet_model_n)])
+    triplet_model = Model([triplet_model_a, triplet_model_p, triplet_model_n], triplet_model_out)
+    triplet_model.summary()
 
-triplet_model_out = Concatenate()([model(triplet_model_a), model(triplet_model_p), model(triplet_model_n)])
-triplet_model = Model([triplet_model_a, triplet_model_p, triplet_model_n], triplet_model_out)
-triplet_model.summary()
+    triplet_model.compile(loss=triplet_loss, optimizer="adam", metrics=['accuracy', keras.metrics.BinaryAccuracy()])
+    #input("Press Enter")
 
-triplet_model.compile(loss=triplet_loss, optimizer="adam", metrics=['accuracy', keras.metrics.BinaryAccuracy()])
-#input("Press Enter")
+    training_data = ([anchors[0:int(len(anchors)*0.7)], positives[0:int(len(anchors)*0.7)], negatives[0:int(len(anchors)*0.7)]])
+    testing_data = ([anchors[int(len(anchors)*0.7):], positives[int(len(anchors)*0.7):], negatives[int(len(anchors)*0.7):]])
 
-training_data = ([anchors[0:int(len(anchors)*0.7)], positives[0:int(len(anchors)*0.7)], negatives[0:int(len(anchors)*0.7)]])
-testing_data = ([anchors[int(len(anchors)*0.7):], positives[int(len(anchors)*0.7):], negatives[int(len(anchors)*0.7):]])
+    batch_size = int(len(anchors)*0.7)
+    print(batch_size)
 
-batch_size = int(len(anchors)*0.7)
-print(batch_size)
+    #################UNCOMMENT###################
 
-#################UNCOMMENT###################
+    history = triplet_model.fit(x=training_data, y=np.zeros((batch_size, 1)).astype("float32"), steps_per_epoch=steps_per_epoch, epochs=epochs, batch_size=b_size)
 
-history = triplet_model.fit(x=training_data, y=np.zeros((batch_size, 1)).astype("float32"), steps_per_epoch=150, epochs=50, batch_size=16)
-triplet_model.save("MNISTtriplet.h5")
+    y_test = np.zeros((int(len(anchors)) - (int(len(anchors) * 0.7)), 1)).astype("float32")
+
+    evaluation = triplet_model.evaluate(testing_data, y_test, verbose=1)
+
+    print(evaluation)
+    #print(type(evaluation))
+    try:
+        loss, accuracy, f1_score, precision, recall = evaluation
+        print("loss:", loss)
+        print("accuracy:", accuracy)
+        print("f1_score:", f1_score)
+        print("precision:", precision)
+        print("recall:", recall)
+    except:
+        print("could not unpack values")
+
+    prediction = triplet_model.predict([anchors[:1], positives[:1], negatives[:1]])
+    print("prediction shape:", prediction.shape)
+    print(prediction)
+    #x_test = x_test.reshape(x_test.shape[1],x_test.shape[2],x_test.shape[3],x_test.shape[4])
+    #x_test = np.array(x_test[1], x_test[2], x_test[3], x_test[4])
+
+    #model_embeddings = triplet_model.layers[3].predict(testing_data, verbose=1)
+    #print(model_embeddings.shape)
+    #import matplotlib.pyplot as plt
+
+    #print("Accuracy Score:")
+    #triplet_model.score(x_test, y_test)
+    #y_pred = (prediction > 1)
+    #matrix = metrics.confusion_matrix(y_test.argmax(axis=1), y_pred.argmax(axis=1))
+    #print(matrix)
+    #cm_display = metrics.ConfusionMatrixDisplay(confusion_matrix = matrix, display_labels = [False, True])
+    #cm_display.plot()
+    #plt.show()
+
+    # summarize history for accuracy
+    print(type(history))
+    print(type(history.history))
+    print(len(history.history))
+    print(history.history)
+
+    #plt.plot(history.history['loss'])
+    #plt.plot(history.history['binary_accuracy'])
+    #plt.title('model accuracy')
+    #plt.ylabel('loss')
+    #plt.xlabel('epoch')
+    #plt.legend(['Loss', 'Binary_Accuracy'], loc='upper left')
+    #plt.show()
+    # summarize history for loss
+    '''
+    plt.plot(history.history['loss'])
+    plt.plot(history.history['val_loss'])
+    plt.title('model loss')
+    plt.ylabel('loss')
+    plt.xlabel('epoch')
+    plt.legend(['Train', 'Validation'], loc='upper left')
+    plt.show()
+    '''
+    '''
+    reduced_embeddings = umap.UMAP(n_neighbors = 15, min_dist = 0.3, metric = 'correlaton').fit_transform(model_embeddings)
+    print(reduced_embeddings.shape)
+    
+    plt.scatter(reduced_embeddings[:, 0], reduced_embeddings[:,1], c=y_test)'''
+    return evaluation[0], evaluation[2], triplet_model
 
 
-#x_test = x_test.reshape(x_test.shape[1],x_test.shape[2],x_test.shape[3],x_test.shape[4])
-#x_test = np.array(x_test[1], x_test[2], x_test[3], x_test[4])
+## Edit below function calling for image alteration
 
-#model_embeddings = triplet_model.layers[3].predict(testing_data, verbose=1)
-#print(model_embeddings.shape)
+## CREATING INPUT IMAGE ARRAYS ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ ##
 
+## Adjust these variables to alter input images ##
+iterations = 100
+simplified = True
+contrast = 0
+brightness = 0
+(anchors, positives, negatives) = convertCSVtoImageArray(path=path, csvPath=csvPath, simplified=simplified, contrast=contrast, brightness=brightness)
+
+start_time = time.time()
+x_train = np.array((anchors[0:int(len(anchors)*0.7)], positives[0:int(len(anchors)*0.7)], negatives[0:int(len(anchors)*0.7):]))
+x_test = np.array((anchors[int(len(anchors)*0.7):], positives[int(len(anchors)*0.7):], negatives[int(len(anchors)*0.7):]))
+y_train = np.arange(0, int(len(anchors)*0.7))
+y_test = np.arange(int(len(anchors)*0.7), int(len(anchors)))
+
+print(anchors.shape)
+print(positives.shape)
+print(negatives.shape)
+print(x_train.shape)
+print(x_test.shape)
+
+## CREATING INPUT IMAGE ARRAYS ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑ ##
+
+# main loop
+avg_bin_acc = []
+min_bin_acc = 100
+max_bin_acc = 0
+curr_acc = None
+for i in range(0, iterations):
+    # steps_per_epoch = 150, epochs = 50, b_size = 16
+    _, curr_acc, t_model = build_model(steps_per_epoch=150, epochs=50, b_size=16)
+
+    avg_bin_acc.append(curr_acc)
+
+    if curr_acc<min_bin_acc:
+        min_bin_acc=curr_acc
+
+    if curr_acc>max_bin_acc:
+        max_bin_acc=curr_acc
+        curr_acc = round(curr_acc*100, 2)
+        t_model.save("savedModels/TripletModel" + "Sim" + str(simplified) + "_" + str(contrast) + "_" + str(brightness) + "_" + str(curr_acc) + ".h5")
+full_time = time.time() - start_time
+print("Full Process Took:", full_time)
+print("Averaging ", full_time/iterations, "per iteration")
+print("Simplified:", simplified)
+print("Contrast:", contrast)
+print("Brightness:", brightness)
+print("Average of binary accuracies: " + str(sum(avg_bin_acc) / len(avg_bin_acc)))
+print("Lowest Model Accuracy:", min_bin_acc)
+print("Highest Model Accuracy:", max_bin_acc)
+
+# Below feedback arrays are not used
 def recall_m(y_true, y_pred):
     true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
     possible_positives = K.sum(K.round(K.clip(y_true, 0, 1)))
@@ -201,59 +314,3 @@ def f1_m(y_true, y_pred):
     precision = precision_m(y_true, y_pred)
     recall = recall_m(y_true, y_pred)
     return 2*((precision*recall)/(precision+recall+K.epsilon()))
-
-
-y_test = np.zeros((int(len(anchors))-(int(len(anchors)*0.7)), 1)).astype("float32")
-
-evaluation = triplet_model.evaluate(testing_data, y_test, verbose=1)
-
-print(evaluation)
-print(type(evaluation))
-try:
-    loss, accuracy, f1_score, precision, recall = evaluation
-    print("loss:", loss)
-    print("accuracy:", accuracy)
-    print("f1_score:", f1_score)
-    print("precision:", precision)
-    print("recall:", recall)
-except:
-    print("could not unpack values")
-
-prediction = triplet_model.predict([anchors[:1], positives[:1], negatives[:1]])
-print("prediction shape:", prediction.shape)
-print(prediction)
-
-
-import matplotlib.pyplot as plt
-
-# summarize history for accuracy
-print(type(history))
-print(type(history.history))
-
-print(len(history.history))
-print(history.history)
-
-
-
-plt.plot(history.history['loss'])
-plt.plot(history.history['binary_accuracy'])
-plt.title('model accuracy')
-plt.ylabel('loss')
-plt.xlabel('epoch')
-plt.legend(['Loss', 'Binary_Accuracy'], loc='upper left')
-plt.show()
-# summarize history for loss
-'''
-plt.plot(history.history['loss'])
-plt.plot(history.history['val_loss'])
-plt.title('model loss')
-plt.ylabel('loss')
-plt.xlabel('epoch')
-plt.legend(['Train', 'Validation'], loc='upper left')
-plt.show()
-'''
-'''
-reduced_embeddings = umap.UMAP(n_neighbors = 15, min_dist = 0.3, metric = 'correlaton').fit_transform(model_embeddings)
-print(reduced_embeddings.shape)
-
-plt.scatter(reduced_embeddings[:, 0], reduced_embeddings[:,1], c=y_test)'''
