@@ -1,8 +1,5 @@
 import cv2
 import numpy as np
-import os
-f_root = "D:/Programs/Program Files/Pycharm Projects/SF22-23-KinshipVerificationML/Data/scienceFairRawFacesNOBG/"
-save_root = r"D:/Programs/Program Files/Pycharm Projects/SF22-23-KinshipVerificationML/Data/scienceFairC1B20/"
 
 def adjust_contrast(image, contrast_factor):
     # Convert image to floating point format
@@ -19,6 +16,22 @@ def adjust_contrast(image, contrast_factor):
 
     return image
 
+'''
+def adjust_brightness(image, brightness_factor):
+    # Convert image to floating point format
+    image = np.float32(image)
+
+    # Calculate new brightness adjusted image
+    image = image + brightness_factor
+
+    # Clip image values to range [0, 255]
+    image = np.clip(image, 0, 255)
+
+    # Convert image back to uint8 format
+    image = np.uint8(image)
+
+    return image
+'''
 def increase_brightness(img, value=0):
     img = np.float32(img)
 
@@ -39,7 +52,7 @@ def adjust_contrast_brightness_ui(image):
     cv2.namedWindow('Contrast and Brightness Adjustment')
 
     # Create trackbars to adjust the contrast and brightness factors
-    cv2.createTrackbar('Contrast Factor', 'Contrast and Brightness Adjustment', 1, 100, lambda x: x)
+    cv2.createTrackbar('Contrast Factor', 'Contrast and Brightness Adjustment', 10, 100, lambda x: x)
     cv2.createTrackbar('Brightness Factor', 'Contrast and Brightness Adjustment', 0, 100, lambda x: x)
 
     while True:
@@ -65,28 +78,16 @@ def adjust_contrast_brightness_ui(image):
 
     # Destroy the window
     cv2.destroyAllWindows()
-'''
-def main_func(img):
-    img = cv2.imread(f_root + img)
-    img = adjust_contrast(img, contrast_factor=1)
-    img = increase_brightness(img, value=20)
-    return img
 
-if __name__ == "__main__":
-    noBGArr = os.listdir(f_root)
-    counter = 0
-    for i in range(0, len(noBGArr)):
-        cv2.imwrite((save_root + "simplifiedF" + noBGArr[i][5:]), main_func(noBGArr[i]))
-        print(save_root + "simplifiedF" + noBGArr[i][5:])
-        print(i)
 # Load an image
-#image = cv2.imread(r'D:/Programs/Program Files/Pycharm Projects/SF22-23-KinshipVerificationML/Data/scienceFairTriangulatedFaces/simplifiedFace16.jpg')
+image = cv2.imread(r'D:\Programs\Program Files\Pycharm Projects\SF22-23-KinshipVerificationML\Data\scienceFairTriangulatedFaces\simplifiedFace16.jpg')
 
-#scale_percent = 600  # percent of original size
-#width = int(image.shape[1] * scale_percent / 100)
-#height = int(image.shape[0] * scale_percent / 100)
-#dim = (width, height)
+scale_percent = 600  # percent of original size
+width = int(image.shape[1] * scale_percent / 100)
+height = int(image.shape[0] * scale_percent / 100)
+dim = (width, height)
 
-#image = cv2.resize(image, dim)
+image = cv2.resize(image, dim)
+'''
 # Adjust the contrast and brightness of the image using the UI
-#adjust_contrast_brightness_ui(image)
+# adjust_contrast_brightness_ui(image)

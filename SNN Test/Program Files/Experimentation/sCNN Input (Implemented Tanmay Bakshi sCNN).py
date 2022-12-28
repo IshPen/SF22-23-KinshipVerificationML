@@ -18,6 +18,7 @@ from keras.models import Model
 from keras.layers import *
 import cv2
 import time
+from contrast import adjust_contrast, increase_brightness
 
 from sklearn.model_selection import train_test_split
 from facialTriangulationAvg import triangulation
@@ -65,7 +66,7 @@ def convertCSVtoImageArray(path, csvPath, simplified, contrast, brightness):
 
         ## IMAGE SOURCING ##
 
-        if simplified==True:
+        if simplified:
             a_i = cv2.imread(str(simplified_path + r"\simplifiedF" + (anchor_paths[image])[1:]))
             a_i = cv2.resize(a_i, resize)
 
@@ -75,7 +76,7 @@ def convertCSVtoImageArray(path, csvPath, simplified, contrast, brightness):
             n_i = cv2.imread(str(simplified_path + r"\simplifiedF" + (negative_paths[image])[1:]))
             n_i = cv2.resize(n_i, resize)
 
-        elif simplified==False:
+        elif not simplified:
             a_i = cv2.imread(str(path + r"\noBG" + anchor_paths[image]))
             a_i = cv2.resize(a_i, resize)
             # print(str(simplified_path + r"\simplifiedF" + (anchor_paths[image])[1:]))
@@ -85,7 +86,20 @@ def convertCSVtoImageArray(path, csvPath, simplified, contrast, brightness):
 
             n_i = cv2.imread(str(path + r"\noBG" + negative_paths[image]))
             n_i = cv2.resize(n_i, resize)
+        if contrast > 1:
+            a_i = adjust_contrast(a_i, contrast_factor=contrast)
+            p_i = adjust_contrast(p_i, contrast_factor=contrast)
+            n_i = adjust_contrast(n_i, contrast_factor=contrast)
 
+        #a_iprev = a_i
+        a_i = increase_brightness(a_i, value=brightness)
+        p_i = increase_brightness(p_i, value=brightness)
+        n_i = increase_brightness(n_i, value=brightness)
+        #a_i = cv2.resize(a_i, (a_i.shape[0]*15, a_i.shape[1]*15))
+        #a_iprev = cv2.resize(a_iprev, (a_iprev.shape[0]*15, a_iprev.shape[1]*15))
+        #cv2.imshow("a_i", a_i)
+        #cv2.imshow("aiprev", a_iprev)
+        #cv2.waitKey()
         anchor_images.append(a_i)
         positive_images.append(p_i)
         negative_images.append(n_i)
@@ -250,9 +264,9 @@ def build_model(steps_per_epoch, epochs, b_size):
 
 ## Adjust these variables to alter input images ##
 iterations = 100
-simplified = True
-contrast = 0
-brightness = 0
+simplified = False
+contrast = 2.0  # Values for contrast are between 1.0 and 2.0 in gaps of .25
+brightness = 0  # Values for brightness are between 0 and 100 in gaps of 20
 (anchors, positives, negatives) = convertCSVtoImageArray(path=path, csvPath=csvPath, simplified=simplified, contrast=contrast, brightness=brightness)
 
 start_time = time.time()
@@ -276,8 +290,8 @@ max_bin_acc = 0
 curr_acc = None
 for i in range(0, iterations):
     # steps_per_epoch = 150, epochs = 50, b_size = 16
+    print(i)
     _, curr_acc, t_model = build_model(steps_per_epoch=150, epochs=50, b_size=16)
-
     avg_bin_acc.append(curr_acc)
 
     if curr_acc<min_bin_acc:
@@ -293,7 +307,8 @@ print("Averaging ", full_time/iterations, "per iteration")
 print("Simplified:", simplified)
 print("Contrast:", contrast)
 print("Brightness:", brightness)
-print("Average of binary accuracies: " + str(sum(avg_bin_acc) / len(avg_bin_acc)))
+print("Binary Accuracy Array:", str(avg_bin_acc))
+print("Average of binary accuracies: ", str(sum(avg_bin_acc) / len(avg_bin_acc)))
 print("Lowest Model Accuracy:", min_bin_acc)
 print("Highest Model Accuracy:", max_bin_acc)
 
